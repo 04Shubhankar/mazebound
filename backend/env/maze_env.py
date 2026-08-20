@@ -27,7 +27,9 @@ class MazeEnv(gym.Env):
         )
     
     def reset(self):
-        pass
+        self.agent_pos = list(self.start)
+        self.maze = np.zeros((self.grid_size, self.grid_size), dtype=np.int32)
+        return self.maze.copy()
     
     def step(self, action):
         pass
