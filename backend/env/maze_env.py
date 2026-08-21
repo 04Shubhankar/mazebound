@@ -72,4 +72,14 @@ class MazeEnv(gym.Env):
 
     
     def render(self):
-        pass
+        for r in range(self.grid_size):
+            for c in range(self.grid_size):
+                if (r, c) == tuple(self.agent_pos):
+                    print("A", end=" ")
+                elif (r, c) == self.goal:
+                    print("G", end=" ")
+                elif self.maze[r, c] == 1:
+                    print("#", end=" ")
+                else:
+                    print(".", end=" ")
+            print()
