@@ -32,7 +32,44 @@ class MazeEnv(gym.Env):
         return self.maze.copy()
     
     def step(self, action):
-        pass
+        row, col = self.agent_pos
+        if action == 0:  # up
+            row -= 1
+        elif action == 1:  # down
+            row += 1
+        elif action == 2:  # left
+            col -= 1
+        elif action == 3:  # right
+            col += 1
+
+        # Check 1: Is new position within bounds?
+        if row < 0 or row >= self.grid_size or col < 0 or col >= self.grid_size:
+            # If boundary hit don't move and penalize
+            reward = -1
+            done = False
+            return self.maze.copy(), reward, done, {}
+
+        # Check 2: Is new position a wall?
+        if self.maze[row, col] == 1:
+            # If wall hit don't move and penalize
+            reward = -1
+            done = False
+            return self.maze.copy(), reward, done, {}
+
+        # If valid move, update agent position
+        self.agent_pos = [row, col]
+
+        # Check 3: Has the agent reached the goal?
+        if self.agent_pos == list(self.goal):
+            reward = 100  # Reward for reaching the goal
+            done = True
+
+        else:
+            reward = -1  # Small penalty for each step taken
+            done = False
+
+        return self.maze.copy(), reward, done, {}
+
     
     def render(self):
         pass
