@@ -20,4 +20,12 @@ class Agent:
         self.policy_net = DQN(self.input_size, self.output_size)
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=self.lr)
         self.buffer = ReplayBuffer(buffer_capacity)
+
+    def select_action(self, state):
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.output_size)
     
+        state_tensor = torch.FloatTensor(state.flatten()).unsqueeze(0) 
+        with torch.no_grad():
+            q_values = self.policy_net(state_tensor)
+        return q_values.argmax().item()
