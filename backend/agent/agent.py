@@ -29,3 +29,32 @@ class Agent:
         with torch.no_grad():
             q_values = self.policy_net(state_tensor)
         return q_values.argmax().item()
+    
+    def train(self):
+        if len(self.buffer) < self.batch_size:
+            return
+
+        batch = self.buffer.sample(self.batch_size)
+        states, actions, rewards, next_states, dones = zip(*batch)
+
+        states = torch.FloatTensor(np.array(states)).view(-1, self.input_size)
+        actions = torch.LongTensor(actions).unsqueeze(1)
+        rewards = torch.FloatTensor(rewards).unsqueeze(1)
+        next_states = torch.FloatTensor(np.array(next_states)).view(-1, self.input_size)
+        dones = torch.FloatTensor(dones).unsqueeze(1)
+
+        current_q_values = self.policy_net(states).gather(1, actions)
+
+        with torch.no_grad():
+            next_q = self.policy_net(next_states).max(1, keepdim=True)[0]
+
+        target_q_values = rewards + (self.gamma * next_q * (1 - dones))
+
+        loss = nn.MSELoss()(current_q_values, target_q_values)
+        
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
+    def update_epsilon(self):
+        self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
