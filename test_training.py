@@ -2,6 +2,11 @@ from backend.env.maze_env import MazeEnv
 from backend.agent.agent import Agent
 
 env = MazeEnv()
+# Temporary hardcoded walls for testing
+env.maze[2, 0:8] = 1  # horizontal wall
+env.maze[5, 2:10] = 1  # another horizontal wall
+env.maze[0:5, 5] = 1  # vertical wall
+
 agent = Agent()
 
 for episode in range(500):
