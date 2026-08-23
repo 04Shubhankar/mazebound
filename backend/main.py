@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from backend.env.maze_env import MazeEnv
 from backend.agent.agent import Agent
+import numpy as np
 
 app = FastAPI()
 
@@ -20,10 +21,21 @@ def root():
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     
-    env = MazeEnv()
-    agent = Agent()
+    # Receive settings from frontend
+    data = await websocket.receive_json()
+    episodes = data.get("episodes", 500)
+    maze_walls = data.get("maze", None)
     
-    for episode in range(500):
+    env = MazeEnv(grid_size=10)
+
+    
+    # Apply user drawn walls if provided
+    if maze_walls:
+        env.maze = np.array(maze_walls, dtype=np.int32)
+    
+    agent = Agent(grid_size=10)
+    
+    for episode in range(episodes):
         state, _ = env.reset()
         done = False
         
