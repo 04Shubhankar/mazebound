@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.env.maze_env import MazeEnv
 from backend.agent.agent import Agent
 import numpy as np
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI()
 
@@ -25,10 +30,8 @@ async def websocket_endpoint(websocket: WebSocket):
     data = await websocket.receive_json()
     episodes = data.get("episodes", 500)
     maze_walls = data.get("maze", None)
-    
     env = MazeEnv(grid_size=10)
 
-    
     # Apply user drawn walls if provided
     if maze_walls:
         env.maze = np.array(maze_walls, dtype=np.int32)
@@ -54,3 +57,6 @@ async def websocket_endpoint(websocket: WebSocket):
             })
         
         agent.update_epsilon()
+        logger.info(f"Episode {episode + 1} complete | Epsilon: {round(agent.epsilon, 3)}")
+
+    logger.info("Training complete")
