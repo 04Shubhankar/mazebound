@@ -17,7 +17,7 @@ export default function App() {
   const [isTraining, setIsTraining] = useState(false);
   const [status, setStatus] = useState('disconnected'); // 'disconnected' | 'connecting' | 'connected' | 'training'
   const [episodes, setEpisodes] = useState(500);
-  const [throttleMs, setThrottleMs] = useState(20); // playback delay in ms
+  const [throttleMs, setThrottleMs] = useState(0); // playback delay in ms (0 = max speed)
   const [wsUrl, setWsUrl] = useState('ws://localhost:8000/ws');
   const [errorMessage, setErrorMessage] = useState(null);
 
